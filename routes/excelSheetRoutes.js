@@ -4,8 +4,6 @@ const path = require('path');
 const excelSheetController = require('../controller/excelSheetController');
 const router = express.Router();
 const storage = multer.memoryStorage();
-// const upload = multer({ storage });
-// console.log(storage)
 const upload = multer({ storage });
 const validateCSVFile = (req, res, next) => {
     if (!req.file || !req.file.originalname.endsWith('.csv')) {
