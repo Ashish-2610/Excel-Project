@@ -1,5 +1,5 @@
 # Excel Project
-**project-root/ **<br>
+project-root/ <br>
 │<br>
 ├── controllers/            # Route logic and business rules<br>
 │   └── excelSheetController.js<br>
@@ -33,11 +33,11 @@ Setup Instructions<br>
 6. pm2 stop excel-project(To stop the server when running with PM2)<br>
 7. pm2 restart excel-project(To restart the server with PM2 manually)<br>
 <br>
-** .ENV SAMPLE ** <br>
+.ENV SAMPLE  <br>
 MONGO_URI = MongoDbURL<br>
 JOB_NAME = job-name<br>
 <br>
-**API ENDPOINTS **<br>
+API ENDPOINTS<br>
 1. Upload Policies via CSV<br>
     POST /api/upload<br>
     Upload a .csv file via multipart/form-data<br>
