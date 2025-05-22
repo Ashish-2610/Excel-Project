@@ -2,9 +2,9 @@ const Agenda = require('agenda');
 const Message = require('./models/message');
 const agenda = new Agenda({
   db: { address: process.env.MONGO_URI, collection: 'jobs' },
-  processEvery: '30 seconds',
+  processEvery: '5 seconds',
 });
-agenda.define('send message', async (job) => {
+agenda.define(process.env.JOB_NAME, async (job) => {
 try {
   const { message, scheduledFor } = job.attrs.data;
     await Message.create({ text: message, scheduledFor });
@@ -13,7 +13,11 @@ try {
   }
 });
 (async function () {
+try {
   await agenda.start();
+} catch (err) {
+  console.error('Failed to start', err);
+}
 })();
 
 module.exports = agenda;

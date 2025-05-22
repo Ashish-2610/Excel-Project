@@ -7,7 +7,13 @@ const storage = multer.memoryStorage();
 // const upload = multer({ storage });
 // console.log(storage)
 const upload = multer({ storage });
-router.post('/upload', upload.single('file'),excelSheetController.uploadCSV);
+const validateCSVFile = (req, res, next) => {
+    if (!req.file || !req.file.originalname.endsWith('.csv')) {
+      return res.status(400).json({ message: 'Only CSV files are allowed' });
+    }
+    next();
+  };
+router.post('/upload', upload.single('file'),validateCSVFile,excelSheetController.uploadCSV);
 router.get('/search-policy',excelSheetController.searchPoliciesByUserName );
 router.get('/aggregate/by/user', excelSheetController.getAggregatedPoliciesByUser);
 module.exports = router;

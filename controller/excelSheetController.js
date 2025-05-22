@@ -9,6 +9,9 @@ const user = require('../models/user');
 
 exports.uploadCSV = async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'CSV file is required' });
+    }
     const csvBuffer = req.file.buffer;
     const csvString = csvBuffer.toString();
     const jsonArray = await csv().fromString(csvString);
@@ -65,12 +68,9 @@ exports.uploadCSV = async (req, res) => {
 exports.searchPoliciesByUserName = async (req, res) => {
   try {
     const {firstName}  = req.query;
-    // console.log(firstName)
-
     if (!firstName) {
       return res.status(400).json({ message: 'First name is required' });
     }
-
     const policies = await Policy.aggregate([
       {
         $lookup: {
@@ -127,7 +127,6 @@ exports.getAggregatedPoliciesByUser = async (req, res) => {
         }
       }
     ]);
-
     res.status(200).json(result);
   } catch (error) {
     res.status(400).json({ message: 'Fetch Failed', error: error.message });

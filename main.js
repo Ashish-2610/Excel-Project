@@ -10,23 +10,34 @@ app.get('/get',(req,res)=>{
     res.send("hello world")
 })
 app.post('/api/schedule-message', async (req, res) => {
-    const { message, day, time } = req.body;
-    /*
-    Body:
-    {
-        "message": "String",
-        "day": "YYYY-MM-DD",
-        "time": "HH:MM:SS"(08:33:00)(24 Hours Format)
-    }
-    */
-    if (!message || !day || !time) {
-      return res.status(400).json({ error: 'Please provide message, day and time' });
-    }
-
-    const scheduledDate = new Date(`${day}T${time}`);
-
     try {
-      await agenda.schedule(scheduledDate, 'send message', { message, scheduledFor: scheduledDate });
+      const { message, day, time } = req.body;
+      /*
+      Body:
+      {
+          "message": "String",
+          "day": "YYYY-MM-DD",
+          "time": "HH:MM:SS"(08:33:00 in 24 Hours Format)
+      }
+      */ 
+      if (!message || !day || !time) {
+        return res.status(400).json({ error: 'Please provide message, day and time' });
+      }
+  
+      const scheduledDate = new Date(`${day}T${time}`);
+      if (isNaN(scheduledDate.getTime()) || scheduledDate < new Date()) {
+        return res.status(400).json({ error: 'Invalid or past date/time provided' });
+      }
+  
+      const existingJobs = await agenda.jobs({
+        name: process.env.JOB_NAME,
+        'data.message': message,
+        'data.scheduledFor': scheduledDate
+      });
+      if (existingJobs.length > 0) {
+        return res.status(409).json({ error: 'Duplicate job already scheduled' });
+      }
+      await agenda.schedule(scheduledDate, process.env.JOB_NAME, { message, scheduledFor: scheduledDate });
       res.json({ message: 'Message scheduled successfully', scheduledDate });
     } catch (err) {
       res.status(500).json({ error: 'Failed to schedule message', details: err.message });
